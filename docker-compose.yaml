@@ -29,6 +29,7 @@ services:
       - ./dags:/opt/airflow/dags
       - ./scripts:/opt/airflow/scripts
       - ./data_lake:/opt/airflow/data_lake
+      - ./tests:/opt/airflow/tests
     ports:
       - "8080:8080"
     # Comando para inicializar o banco, criar usuário e subir o serviço

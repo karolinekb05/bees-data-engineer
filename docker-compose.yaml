@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres_db
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  airflow:
+    build: .
+    container_name: airflow_app
+    depends_on:
+      postgres:
+        condition: service_healthy  # Espera o banco estar pronto para evitar erros de conexão
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__FERNET_KEY=SRdZGX0bbHVE-LD-FEg7tzTobqO9-yCiHittXQeQ9Ec=
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./data_lake:/opt/airflow/data_lake
+    ports:
+      - "8080:8080"
+    # Comando para inicializar o banco, criar usuário e subir o serviço
+    command: >
+      bash -c "airflow db migrate && 
+      airflow users create --username admin --firstname admin --lastname admin --role Admin --email admin@example.com --password admin && 
+      airflow standalone"

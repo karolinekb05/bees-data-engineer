@@ -26,15 +26,28 @@ The project implements three distinct layers to ensure data integrity and analyt
 * Docker and Docker Compose installed.
 
 ### Step-by-Step Instructions
-1.  **Build and start the environment:**
+
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/your-user/repository-name.git](https://github.com/your-user/repository-name.git)
+    cd repository-name
+    ```
+
+2.  **Generate a Fernet Key:**
+    The Airflow scheduler and webserver require a `FERNET_KEY` to encrypt sensitive data in the metadata database. You can generate one using Python:
+    ```bash
+    python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    ```
+    *Copy the output and paste it into `docker-compose.yaml` file as `AIRFLOW__CORE__FERNET_KEY`.*
+
+3.  **Build and start the environment:**
     ```bash
     docker-compose up --build
     ```
-2.  **Access the Airflow UI:**
-    * URL: `http://localhost:8080`
 
-3.  **Activate the Pipeline:**
-    * Locate the `bees_brewery` DAG and toggle it to start the sequential execution of the medallion layers.
+4.  **Access the Airflow UI:**
+    * URL: `http://localhost:8080`
+    * Locate the `bees_brewery` DAG and toggle it to start the sequential execution.
 
 ---
 
@@ -83,19 +96,24 @@ O projeto implementa três camadas distintas para garantir a integridade dos dad
 Docker e Docker Compose instalados.
 
 **Passo a Passo**
-1. Construir e subir o ambiente:
 
+1.  **Configurar a Chave de Segurança:**
+    O Airflow exige uma `FERNET_KEY` para criptografar dados sensíveis. Gere uma chave executando o comando abaixo no seu terminal:
+    ```bash
+    python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    ```
+    *Copie o resultado e adicione ao seu arquivo `docker-compose.yaml` na variável `AIRFLOW__CORE__FERNET_KEY`.*
+
+2.  **Construir e subir o ambiente:**
     ```bash
     docker-compose up --build
     ```
 
-2. Acessar o Airflow:
+3.  **Acessar o Airflow:**
+    * URL: `http://localhost:8080` (Login/Senha padrão definidos no `docker-compose.yaml`).
 
-URL: `http://localhost:8080`(Login/Senha padrão definidos no compose).
-
-3. Ativar o Pipeline:
-
-Localize a DAG `bees_brewery` e ative-a para iniciar a execução sequencial das camadas.
+4.  **Ativar o Pipeline:**
+    * Localize a DAG `bees_brewery` e ative-a (toggle ON) para iniciar a execução sequencial das camadas Medallion.
 
 ## 🛡️ Tratamento de Erros e Monitoramento
 Conforme exigido pelo caso, o pipeline inclui:
